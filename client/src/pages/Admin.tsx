@@ -527,43 +527,56 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
 
 export default function Admin() {
   const { dishes, removeDish, isLoading } = useMenu();
-  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [filterCat, setFilterCat] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const [passwordInput, setPasswordInput] = useState("");
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   const isDev = import.meta.env.DEV;
-  // Auth gate: bypassed ONLY for local development
-  if (!isDev && authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-gold" size={32} />
-      </div>
-    );
-  }
 
-  if (!isDev && !isAuthenticated) {
+  if (!isUnlocked && !isDev) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-6">
+        <div className="text-center max-w-sm mx-auto px-6 w-full">
           <Shield className="mx-auto text-gold mb-6" size={48} />
           <h2 className="font-serif text-2xl text-foreground mb-3">Acesso Restrito</h2>
-          <p className="text-muted-foreground mb-8">
-            O painel administrativo é restrito a usuários autorizados. Faça login para continuar.
+          <p className="text-muted-foreground mb-8 text-sm">
+            Área exclusiva da administração. Digite a senha para continuar.
           </p>
-          <a
-            href={getLoginUrl()}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-primary-foreground text-sm hover:bg-gold-dark transition-colors"
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const validPass = import.meta.env.VITE_ADMIN_PASSWORD || "lavenue2026";
+              if (passwordInput === validPass) {
+                setIsUnlocked(true);
+              } else {
+                toast.error("Senha incorreta");
+              }
+            }}
+            className="flex flex-col gap-3"
           >
-            <LogIn size={16} /> Fazer Login
-          </a>
-          <div className="mt-6">
-            <Link href="/" className="text-sm text-muted-foreground hover:text-gold transition-colors">
-              Voltar ao menu
+            <input 
+              type="password"
+              placeholder="Sua senha secreta..."
+              value={passwordInput}
+              onChange={e => setPasswordInput(e.target.value)}
+              className="w-full bg-secondary/50 border border-border px-4 py-3 text-center text-foreground focus:outline-none focus:border-gold/50"
+              autoFocus
+            />
+            <button 
+              type="submit"
+              className="w-full bg-gold text-white py-3 mt-1 hover:bg-gold-dark transition-colors font-medium tracking-wide"
+            >
+              ENTRAR
+            </button>
+            <Link href="/" className="text-center text-sm text-muted-foreground hover:text-gold transition-colors mt-6 block">
+              Voltar ao Cardápio
             </Link>
-          </div>
+          </form>
         </div>
       </div>
     );

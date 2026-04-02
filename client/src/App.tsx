@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import DishDetail from "./pages/DishDetail";
 import Quiz from "./pages/Quiz";
+import About from "./pages/About";
 import { MenuProvider } from "./contexts/MenuContext";
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/prato/:id" component={DishDetail} />
       <Route path="/quiz" component={Quiz} />
+      <Route path="/sobre" component={About} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

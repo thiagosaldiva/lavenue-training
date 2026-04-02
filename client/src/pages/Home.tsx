@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useMenu, categoryLabels, type Dish } from "@/contexts/MenuContext";
-import { Search, ChefHat, BookOpen, Shield, Sparkles, Tag, LogIn, LogOut, Loader2 } from "lucide-react";
+import { Search, ChefHat, BookOpen, Shield, Sparkles, Tag, LogIn, LogOut, Loader2, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLoginUrl } from "@/const";
 
@@ -35,6 +35,10 @@ export default function Home() {
             <img src="/logo.webp" alt="L'Avenue de Paris" className="w-56 sm:w-64 md:w-72 h-auto object-contain" />
           </Link>
           <div className="flex items-center gap-4">
+            <Link href="/sobre" className="text-sm text-muted-foreground hover:text-gold transition-colors duration-300 flex items-center gap-2">
+              <Info size={16} />
+              <span className="hidden sm:inline">História</span>
+            </Link>
             <Link href="/quiz" className="text-sm text-muted-foreground hover:text-gold transition-colors duration-300 flex items-center gap-2">
               <BookOpen size={16} />
               <span className="hidden sm:inline">Quiz</span>
