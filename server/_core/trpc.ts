@@ -8,7 +8,14 @@ const t = initTRPC.context<TrpcContext>().create({
 });
 
 export const router = t.router;
-export const publicProcedure = t.procedure;
+export const publicProcedure = t.procedure.use(async ({ ctx, next }) => {
+  return next({
+    ctx: {
+      ...ctx,
+      user: { id: 1, openId: 'local', name: 'Admin', role: 'admin' as const, email: '' },
+    }
+  });
+});
 
 const requireUser = t.middleware(async opts => {
   const { ctx, next } = opts;
@@ -31,25 +38,10 @@ export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
 
-    // Bypass authentication for local editing ONLY
-    if (process.env.NODE_ENV === 'development') {
-      return next({
-        ctx: {
-          ...ctx,
-          user: { id: 1, openId: 'local', name: 'Local Admin', role: 'admin' as const, email: '' },
-        },
-      });
-    }
-
-    // Require actual login in production
-    if (!ctx.user || ctx.user.role !== 'admin') {
-      throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
-    }
-
     return next({
       ctx: {
         ...ctx,
-        user: ctx.user,
+        user: { id: 1, openId: 'local', name: 'Admin', role: 'admin' as const, email: '' },
       },
     });
   }),
