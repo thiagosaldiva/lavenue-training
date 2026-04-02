@@ -527,6 +527,7 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
 
 export default function Admin() {
   const { dishes, removeDish, isLoading } = useMenu();
+  const { user } = useAuth();
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
