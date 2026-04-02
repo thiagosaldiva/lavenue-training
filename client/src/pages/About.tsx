@@ -21,7 +21,7 @@ export default function About() {
       <main className="pt-32 pb-20 container max-w-3xl">
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <section className="text-center space-y-4">
-            <h1 className="font-serif text-4xl md:text-5xl text-gold">L'Avenue</h1>
+            <h1 className="font-serif text-4xl md:text-5xl text-gold">L'Avenue de Paris</h1>
             <h2 className="text-xl md:text-2xl text-muted-foreground uppercase tracking-widest">A Nossa História</h2>
           </section>
 
