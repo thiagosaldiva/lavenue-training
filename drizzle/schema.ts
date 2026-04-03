@@ -36,6 +36,7 @@ export const dishes = sqliteTable("dishes", {
   price: text("price").default(""),
   isNew: integer("isNew", { mode: "boolean" }).default(false),
   isPromo: integer("isPromo", { mode: "boolean" }).default(false),
+  isActive: integer("isActive", { mode: "boolean" }).default(true),
   sortOrder: integer("sortOrder").default(0).notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),

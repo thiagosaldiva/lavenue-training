@@ -13,7 +13,7 @@ import { getLoginUrl } from "@/const";
 import { 
   ArrowLeft, Save, Trash2, Plus, Image, Edit3, X, Check, 
   ChefHat, Shield, BookOpen, Search, Sparkles, Tag,
-  Crop, RotateCw, ZoomIn, ZoomOut, Upload, LogIn, Loader2, ArrowUp, ArrowDown
+  Crop, RotateCw, ZoomIn, ZoomOut, Upload, LogIn, Loader2, ArrowUp, ArrowDown, Play, Pause
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { motion, AnimatePresence } from "framer-motion";
@@ -526,7 +526,7 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
 }
 
 export default function Admin() {
-  const { dishes, removeDish, isLoading } = useMenu();
+  const { dishes, removeDish, isLoading, updateDish } = useMenu();
   const { user } = useAuth();
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -724,7 +724,7 @@ export default function Admin() {
                     </thead>
                     <tbody>
                       {filtered.map((dish) => (
-                        <tr key={dish.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                        <tr key={dish.id} className={`border-b border-border/50 hover:bg-secondary/20 transition-colors ${dish.isActive === false ? 'opacity-50 grayscale' : ''}`}>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
                               <img src={dish.imageUrl || ""} alt={dish.name} className="w-12 h-12 object-cover border border-border shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -756,6 +756,13 @@ export default function Admin() {
                                   <ArrowDown size={14} />
                                 </button>
                               </>
+                              <button
+                                onClick={() => updateDish(dish.id, { isActive: dish.isActive === false ? true : false })}
+                                className="p-2 text-muted-foreground hover:text-gold transition-colors"
+                                title={dish.isActive === false ? "Reativar Prato" : "Pausar Prato"}
+                              >
+                                {dish.isActive === false ? <Play size={16} /> : <Pause size={16} />}
+                              </button>
                               <button
                                 onClick={() => setEditingDish(dish)}
                                 className="p-2 text-muted-foreground hover:text-gold transition-colors"

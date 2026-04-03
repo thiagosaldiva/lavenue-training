@@ -109,7 +109,10 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
         (d.description || "").toLowerCase().includes(q) ||
         ingredients.some((i: string) => i.toLowerCase().includes(q)) ||
         (d.curiosity || "").toLowerCase().includes(q);
-      return matchesCategory && matchesSearch;
+      
+      const isActive = d.isActive !== false;
+      
+      return matchesCategory && matchesSearch && isActive;
     });
   }, [dishes, activeCategory, searchQuery]);
 
