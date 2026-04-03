@@ -748,16 +748,14 @@ export default function Admin() {
                           </td>
                           <td className="px-4 py-3 text-right">
                             <div className="flex items-center justify-end gap-1">
-                              {filterCat !== "all" && (
-                                <>
-                                  <button onClick={() => moveDish(dish.id, -1)} className="p-1.5 text-muted-foreground hover:text-foreground transition-colors" title="Subir (Apenas visualizando categorias específicas)" disabled={reorderMutation.isPending}>
-                                    <ArrowUp size={14} />
-                                  </button>
-                                  <button onClick={() => moveDish(dish.id, 1)} className="p-1.5 text-muted-foreground hover:text-foreground transition-colors mr-2" title="Descer (Apenas visualizando categorias específicas)" disabled={reorderMutation.isPending}>
-                                    <ArrowDown size={14} />
-                                  </button>
-                                </>
-                              )}
+                              <>
+                                <button onClick={() => moveDish(dish.id, -1)} className="p-1.5 text-muted-foreground hover:text-foreground transition-colors" title="Subir posição no Cardápio" disabled={reorderMutation.isPending}>
+                                  <ArrowUp size={14} />
+                                </button>
+                                <button onClick={() => moveDish(dish.id, 1)} className="p-1.5 text-muted-foreground hover:text-foreground transition-colors mr-2" title="Descer posição no Cardápio" disabled={reorderMutation.isPending}>
+                                  <ArrowDown size={14} />
+                                </button>
+                              </>
                               <button
                                 onClick={() => setEditingDish(dish)}
                                 className="p-2 text-muted-foreground hover:text-gold transition-colors"
