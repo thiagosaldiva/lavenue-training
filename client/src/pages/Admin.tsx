@@ -539,7 +539,7 @@ export default function Admin() {
 
   const isDev = import.meta.env.DEV;
 
-  if (!isUnlocked && !isDev) {
+  if (!isUnlocked) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-sm mx-auto px-6 w-full">
