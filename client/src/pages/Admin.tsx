@@ -528,6 +528,10 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
 export default function Admin() {
   const { dishes, removeDish, isLoading, updateDish } = useMenu();
   const { user } = useAuth();
+  const utils = trpc.useUtils();
+  const reorderMutation = trpc.dishes.reorder.useMutation({
+    onSuccess: () => utils.dishes.list.invalidate()
+  });
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
@@ -615,11 +619,6 @@ export default function Admin() {
     toast.success(`"${dish?.name}" removido`);
     setDeleteConfirm(null);
   };
-
-  const utils = trpc.useUtils();
-  const reorderMutation = trpc.dishes.reorder.useMutation({
-    onSuccess: () => utils.dishes.list.invalidate()
-  });
 
   const moveDish = (dishId: number, direction: -1 | 1) => {
     const currentIndex = filtered.findIndex(d => d.id === dishId);
