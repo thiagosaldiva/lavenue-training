@@ -21,6 +21,7 @@ const dishInputSchema = z.object({
   price: z.string().default(""),
   isNew: z.boolean().default(false),
   isPromo: z.boolean().default(false),
+  isActive: z.boolean().default(true),
 });
 
 export const appRouter = router({

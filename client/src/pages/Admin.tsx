@@ -9,11 +9,14 @@ import { getCroppedImg } from "@/utils/cropImage";
 import { Link } from "wouter";
 import { useMenu, categoryLabels, type Dish } from "@/contexts/MenuContext";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { getLoginUrl } from "@/const";
 import { 
   ArrowLeft, Save, Trash2, Plus, Image, Edit3, X, Check, 
   ChefHat, Shield, BookOpen, Search, Sparkles, Tag,
-  Crop, RotateCw, ZoomIn, ZoomOut, Upload, LogIn, Loader2, ArrowUp, ArrowDown, Play, Pause
+  Crop, RotateCw, ZoomIn, ZoomOut, Upload, LogIn, Loader2, Play, Pause, GripVertical
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { motion, AnimatePresence } from "framer-motion";
@@ -620,22 +623,36 @@ export default function Admin() {
     setDeleteConfirm(null);
   };
 
-  const moveDish = (dishId: number, direction: -1 | 1) => {
-    const currentIndex = filtered.findIndex(d => d.id === dishId);
-    if (currentIndex < 0) return;
-    const swapIndex = currentIndex + direction;
-    if (swapIndex < 0 || swapIndex >= filtered.length) return;
+  const utils = trpc.useUtils();
+  const reorderMutation = trpc.dishes.reorder.useMutation({
+    onSuccess: () => {
+      utils.dishes.list.invalidate();
+      toast.success("Cardápio reordenado com sucesso!");
+    }
+  });
 
-    const currentDish = filtered[currentIndex];
-    const swapDish = filtered[swapIndex];
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
-    const currentSort = currentDish.sortOrder || currentIndex;
-    const swapSort = swapDish.sortOrder || swapIndex;
-
-    reorderMutation.mutate([
-      { id: currentDish.id, sortOrder: swapSort },
-      { id: swapDish.id, sortOrder: currentSort }
-    ]);
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    
+    const oldIndex = filtered.findIndex(d => d.id === active.id);
+    const newIndex = filtered.findIndex(d => d.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    
+    // Sort logic respecting current boundaries
+    const occupiedSorts = filtered.map(d => d.sortOrder).sort((a, b) => a - b);
+    
+    const newFiltered = [...filtered];
+    const [moved] = newFiltered.splice(oldIndex, 1);
+    newFiltered.splice(newIndex, 0, moved);
+    
+    const updates = newFiltered.map((d, idx) => ({ id: d.id, sortOrder: occupiedSorts[idx] }));
+    reorderMutation.mutate(updates);
   };
 
   return (
@@ -721,66 +738,15 @@ export default function Admin() {
                         <th className="text-right px-4 py-3 text-xs text-muted-foreground tracking-wider uppercase font-medium">Ações</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {filtered.map((dish) => (
-                        <tr key={dish.id} className={`border-b border-border/50 hover:bg-secondary/20 transition-colors ${dish.isActive === false ? 'opacity-50 grayscale' : ''}`}>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <img src={dish.imageUrl || ""} alt={dish.name} className="w-12 h-12 object-cover border border-border shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                              <div>
-                                <p className="text-sm text-foreground font-medium">{dish.name}</p>
-                                <p className="text-xs text-muted-foreground">{(dish.description || "").slice(0, 50)}...</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 hidden md:table-cell">
-                            <span className="text-xs text-muted-foreground">{categoryLabels[dish.category]}</span>
-                          </td>
-                          <td className="px-4 py-3 hidden sm:table-cell">
-                            <span className="text-sm text-gold font-serif">{dish.price || "—"}</span>
-                          </td>
-                          <td className="px-4 py-3 hidden lg:table-cell">
-                            <div className="flex gap-1">
-                              {dish.isNew && <span className="text-[10px] px-2 py-0.5 bg-gold/10 text-gold border border-gold/20">Novo</span>}
-                              {dish.isPromo && <span className="text-[10px] px-2 py-0.5 bg-burgundy/10 text-burgundy border border-burgundy/20">Promo</span>}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <>
-                                <button onClick={() => moveDish(dish.id, -1)} className="p-1.5 text-muted-foreground hover:text-foreground transition-colors" title="Subir posição no Cardápio" disabled={reorderMutation.isPending}>
-                                  <ArrowUp size={14} />
-                                </button>
-                                <button onClick={() => moveDish(dish.id, 1)} className="p-1.5 text-muted-foreground hover:text-foreground transition-colors mr-2" title="Descer posição no Cardápio" disabled={reorderMutation.isPending}>
-                                  <ArrowDown size={14} />
-                                </button>
-                              </>
-                              <button
-                                onClick={() => updateDish(dish.id, { isActive: dish.isActive === false ? true : false })}
-                                className="p-2 text-muted-foreground hover:text-gold transition-colors"
-                                title={dish.isActive === false ? "Reativar Prato" : "Pausar Prato"}
-                              >
-                                {dish.isActive === false ? <Play size={16} /> : <Pause size={16} />}
-                              </button>
-                              <button
-                                onClick={() => setEditingDish(dish)}
-                                className="p-2 text-muted-foreground hover:text-gold transition-colors"
-                                title="Editar"
-                              >
-                                <Edit3 size={16} />
-                              </button>
-                              <button
-                                onClick={() => setDeleteConfirm(dish.id)}
-                                className="p-2 text-muted-foreground hover:text-destructive transition-colors"
-                                title="Remover"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                      <SortableContext items={filtered.map(d => d.id)} strategy={verticalListSortingStrategy}>
+                        <tbody>
+                          {filtered.map((dish) => (
+                            <SortableRow key={dish.id} dish={dish} updateDish={updateDish} setEditingDish={setEditingDish} setDeleteConfirm={setDeleteConfirm} categoryLabels={categoryLabels} />
+                          ))}
+                        </tbody>
+                      </SortableContext>
+                    </DndContext>
                   </table>
                 </div>
               </div>
