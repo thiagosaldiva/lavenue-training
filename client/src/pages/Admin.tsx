@@ -533,7 +533,10 @@ export default function Admin() {
   const { user } = useAuth();
   const utils = trpc.useUtils();
   const reorderMutation = trpc.dishes.reorder.useMutation({
-    onSuccess: () => utils.dishes.list.invalidate()
+    onSuccess: () => {
+      utils.dishes.list.invalidate();
+      toast.success("Cardápio reordenado com sucesso!");
+    }
   });
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -623,13 +626,7 @@ export default function Admin() {
     setDeleteConfirm(null);
   };
 
-  const utils = trpc.useUtils();
-  const reorderMutation = trpc.dishes.reorder.useMutation({
-    onSuccess: () => {
-      utils.dishes.list.invalidate();
-      toast.success("Cardápio reordenado com sucesso!");
-    }
-  });
+
 
   const sensors = useSensors(
     useSensor(PointerSensor),
