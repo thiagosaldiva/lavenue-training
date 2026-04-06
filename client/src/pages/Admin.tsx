@@ -773,8 +773,8 @@ export default function Admin() {
           ) : (
             <>
               {/* Dishes Table */}
-              <div className="border border-border overflow-hidden">
-                <div className="overflow-x-auto">
+              <div className="border border-border">
+                <div className="w-full">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-secondary/30 border-b border-border">
