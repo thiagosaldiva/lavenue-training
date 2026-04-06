@@ -528,6 +528,58 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
   );
 }
 
+function SortableRow({ dish, updateDish, setEditingDish, setDeleteConfirm, categoryLabels }: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: dish.id });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    ...(isDragging ? { position: 'relative', zIndex: 10, opacity: 0.5 } : {})
+  } as React.CSSProperties;
+
+  return (
+    <tr ref={setNodeRef} style={style} className={`bg-card border-b border-border/50 hover:bg-secondary/20 transition-colors ${dish.isActive === false ? 'opacity-50 grayscale' : ''}`}>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-3">
+          <img src={dish.imageUrl || ""} alt={dish.name} className="w-12 h-12 object-cover border border-border shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          <div>
+            <p className="text-sm text-foreground font-medium">{dish.name}</p>
+            <p className="text-xs text-muted-foreground">{(dish.description || "").slice(0, 50)}...</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-4 py-3 hidden md:table-cell">
+        <span className="text-xs text-muted-foreground">{categoryLabels[dish.category]}</span>
+      </td>
+      <td className="px-4 py-3 hidden sm:table-cell">
+        <span className="text-sm text-gold font-serif">{dish.price || "—"}</span>
+      </td>
+      <td className="px-4 py-3 hidden lg:table-cell">
+        <div className="flex gap-1">
+          {dish.isNew && <span className="text-[10px] px-2 py-0.5 bg-gold/10 text-gold border border-gold/20">Novo</span>}
+          {dish.isPromo && <span className="text-[10px] px-2 py-0.5 bg-burgundy/10 text-burgundy border border-burgundy/20">Promo</span>}
+        </div>
+      </td>
+      <td className="px-4 py-3 text-right">
+        <div className="flex items-center justify-end gap-1">
+          <button {...attributes} {...listeners} className="p-2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none" title="Arrastar prato para reordenar">
+            <GripVertical size={16} />
+          </button>
+          <button onClick={() => updateDish(dish.id, { isActive: dish.isActive === false ? true : false })} className="p-2 text-muted-foreground hover:text-gold transition-colors" title={dish.isActive === false ? "Reativar Prato" : "Pausar Prato"}>
+            {dish.isActive === false ? <Play size={16} /> : <Pause size={16} />}
+          </button>
+          <button onClick={() => setEditingDish(dish)} className="p-2 text-muted-foreground hover:text-gold transition-colors" title="Editar">
+            <Edit3 size={16} />
+          </button>
+          <button onClick={() => setDeleteConfirm(dish.id)} className="p-2 text-muted-foreground hover:text-destructive transition-colors" title="Remover">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 export default function Admin() {
   const { dishes, removeDish, isLoading, updateDish } = useMenu();
   const { user } = useAuth();
