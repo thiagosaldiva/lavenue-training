@@ -538,29 +538,29 @@ function SortableRow({ dish, updateDish, setEditingDish, setDeleteConfirm, categ
   } as React.CSSProperties;
 
   return (
-    <tr ref={setNodeRef} style={style} className={`bg-card border-b border-border/50 hover:bg-secondary/20 transition-colors ${dish.isActive === false ? 'opacity-50 grayscale' : ''}`}>
-      <td className="px-4 py-3">
+    <div ref={setNodeRef} style={style} className={`grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_80px_auto] md:grid-cols-[1fr_120px_80px_auto] lg:grid-cols-[1fr_120px_80px_100px_auto] gap-4 items-center bg-card border-b border-border/50 hover:bg-secondary/20 transition-colors px-4 py-3 ${dish.isActive === false ? 'opacity-50 grayscale' : ''}`}>
+      <div className="min-w-0">
         <div className="flex items-center gap-3">
           <img src={dish.imageUrl || ""} alt={dish.name} className="w-12 h-12 object-cover border border-border shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-          <div>
-            <p className="text-sm text-foreground font-medium">{dish.name}</p>
-            <p className="text-xs text-muted-foreground">{(dish.description || "").slice(0, 50)}...</p>
+          <div className="min-w-0">
+            <p className="text-sm text-foreground font-medium truncate">{dish.name}</p>
+            <p className="text-xs text-muted-foreground truncate">{(dish.description || "").slice(0, 50)}...</p>
           </div>
         </div>
-      </td>
-      <td className="px-4 py-3 hidden md:table-cell">
+      </div>
+      <div className="hidden md:block">
         <span className="text-xs text-muted-foreground">{categoryLabels[dish.category]}</span>
-      </td>
-      <td className="px-4 py-3 hidden sm:table-cell">
+      </div>
+      <div className="hidden sm:block">
         <span className="text-sm text-gold font-serif">{dish.price || "—"}</span>
-      </td>
-      <td className="px-4 py-3 hidden lg:table-cell">
+      </div>
+      <div className="hidden lg:block">
         <div className="flex gap-1">
           {dish.isNew && <span className="text-[10px] px-2 py-0.5 bg-gold/10 text-gold border border-gold/20">Novo</span>}
           {dish.isPromo && <span className="text-[10px] px-2 py-0.5 bg-burgundy/10 text-burgundy border border-burgundy/20">Promo</span>}
         </div>
-      </td>
-      <td className="px-4 py-3 text-right">
+      </div>
+      <div className="text-right">
         <div className="flex items-center justify-end gap-1">
           <button {...attributes} {...listeners} className="p-2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none" title="Arrastar prato para reordenar">
             <GripVertical size={16} />
@@ -575,8 +575,8 @@ function SortableRow({ dish, updateDish, setEditingDish, setDeleteConfirm, categ
             <Trash2 size={16} />
           </button>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 }
 
@@ -775,26 +775,24 @@ export default function Admin() {
               {/* Dishes Table */}
               <div className="border border-border">
                 <div className="w-full">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-secondary/30 border-b border-border">
-                        <th className="text-left px-4 py-3 text-xs text-muted-foreground tracking-wider uppercase font-medium">Prato</th>
-                        <th className="text-left px-4 py-3 text-xs text-muted-foreground tracking-wider uppercase font-medium hidden md:table-cell">Categoria</th>
-                        <th className="text-left px-4 py-3 text-xs text-muted-foreground tracking-wider uppercase font-medium hidden sm:table-cell">Preço</th>
-                        <th className="text-left px-4 py-3 text-xs text-muted-foreground tracking-wider uppercase font-medium hidden lg:table-cell">Status</th>
-                        <th className="text-right px-4 py-3 text-xs text-muted-foreground tracking-wider uppercase font-medium">Ações</th>
-                      </tr>
-                    </thead>
+                  <div className="w-full flex-col flex">
+                    <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_80px_auto] md:grid-cols-[1fr_120px_80px_auto] lg:grid-cols-[1fr_120px_80px_100px_auto] gap-4 bg-secondary/30 border-b border-border px-4 py-3 items-center">
+                      <div className="text-left text-xs text-muted-foreground tracking-wider uppercase font-medium">Prato</div>
+                      <div className="text-left text-xs text-muted-foreground tracking-wider uppercase font-medium hidden md:block">Categoria</div>
+                      <div className="text-left text-xs text-muted-foreground tracking-wider uppercase font-medium hidden sm:block">Preço</div>
+                      <div className="text-left text-xs text-muted-foreground tracking-wider uppercase font-medium hidden lg:block">Status</div>
+                      <div className="text-right text-xs text-muted-foreground tracking-wider uppercase font-medium">Ações</div>
+                    </div>
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                       <SortableContext items={filtered.map(d => d.id)} strategy={verticalListSortingStrategy}>
-                        <tbody>
+                        <div className="flex flex-col w-full">
                           {filtered.map((dish) => (
                             <SortableRow key={dish.id} dish={dish} updateDish={updateDish} setEditingDish={setEditingDish} setDeleteConfirm={setDeleteConfirm} categoryLabels={categoryLabels} />
                           ))}
-                        </tbody>
+                        </div>
                       </SortableContext>
                     </DndContext>
-                  </table>
+                  </div>
                 </div>
               </div>
 
