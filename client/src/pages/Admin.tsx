@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { useMenu, categoryLabels, type Dish } from "@/contexts/MenuContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getLoginUrl } from "@/const";
@@ -789,7 +790,12 @@ export default function Admin() {
                       <div className="text-left text-xs text-muted-foreground tracking-wider uppercase font-medium hidden lg:block">Status</div>
                       <div className="text-right text-xs text-muted-foreground tracking-wider uppercase font-medium">Ações</div>
                     </div>
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <DndContext 
+                      sensors={sensors} 
+                      collisionDetection={closestCenter} 
+                      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+                      onDragEnd={handleDragEnd}
+                    >
                       <SortableContext items={filtered.map(d => d.id)} strategy={verticalListSortingStrategy}>
                         <div className="flex flex-col w-full">
                           {filtered.map((dish) => (
