@@ -541,7 +541,13 @@ function SortableRow({ dish, updateDish, setEditingDish, setDeleteConfirm, categ
     <div ref={setNodeRef} style={style} className={`grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_80px_auto] md:grid-cols-[1fr_120px_80px_auto] lg:grid-cols-[1fr_120px_80px_100px_auto] gap-4 items-center bg-card border-b border-border/50 hover:bg-secondary/20 transition-colors px-4 py-3 ${dish.isActive === false ? 'opacity-50 grayscale' : ''}`}>
       <div className="min-w-0">
         <div className="flex items-center gap-3">
-          <img src={dish.imageUrl || ""} alt={dish.name} className="w-12 h-12 object-cover border border-border shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          {dish.imageUrl ? (
+            <img src={dish.imageUrl} alt={dish.name} className="w-12 h-12 object-cover border border-border shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          ) : (
+            <div className="w-12 h-12 bg-secondary border border-border shrink-0 flex items-center justify-center">
+              <span className="text-[10px] text-muted-foreground">Sem Foto</span>
+            </div>
+          )}
           <div className="min-w-0">
             <p className="text-sm text-foreground font-medium truncate">{dish.name}</p>
             <p className="text-xs text-muted-foreground truncate">{(dish.description || "").slice(0, 50)}...</p>
