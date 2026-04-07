@@ -52,9 +52,9 @@ export default function Quiz() {
       const dishAllergens = getAllergens(dish);
       const questionTypes = [
         {
-          question: `Qual é a descrição do prato "${dish.name}"?`,
-          correct: dish.description,
-          wrong: shuffleArray(dishes.filter(d => d.id !== dish.id)).slice(0, 3).map(d => d.description)
+          question: `Qual prato corresponde à seguinte descrição?\n\n"${dish.description}"`,
+          correct: dish.name,
+          wrong: shuffleArray(dishes.filter(d => d.id !== dish.id)).slice(0, 3).map(d => d.name)
         },
         {
           question: `A qual categoria pertence o prato "${dish.name}"?`,
@@ -62,14 +62,14 @@ export default function Quiz() {
           wrong: Object.entries(categoryLabels).filter(([k]) => k !== dish.category && k !== "all").map(([, v]) => v)
         },
         ...(dishAllergens.length > 0 ? [{
-          question: `Qual alergênico está presente no prato "${dish.name}"?`,
+          question: `Qual dos alergênicos abaixo está presente no prato "${dish.name}"?`,
           correct: dishAllergens[0],
-          wrong: ["Nenhum alergênico", "Frutos do mar", "Amendoim", "Soja"].filter(a => !dishAllergens.includes(a)).slice(0, 3)
+          wrong: ["Nenhum alergênico", "Frutos do mar", "Amendoim", "Soja", "Glúten", "Laticínios"].filter(a => !dishAllergens.includes(a)).slice(0, 3)
         }] : []),
         ...(dish.curiosity ? [{
-          question: `Sobre o prato "${dish.name}", qual informação é verdadeira?`,
-          correct: dish.curiosity.slice(0, 80) + "...",
-          wrong: shuffleArray(dishes.filter(d => d.id !== dish.id && d.curiosity)).slice(0, 3).map(d => (d.curiosity || "").slice(0, 80) + "...")
+          question: `Qual prato possui a seguinte curiosidade:\n\n"${dish.curiosity}"?`,
+          correct: dish.name,
+          wrong: shuffleArray(dishes.filter(d => d.id !== dish.id && d.curiosity)).slice(0, 3).map(d => d.name)
         }] : [])
       ];
       
@@ -338,7 +338,7 @@ export default function Quiz() {
                     </div>
                   )}
 
-                  <h3 className="font-serif text-xl text-foreground">{currentQuestion.question}</h3>
+                  <h3 className="font-serif text-xl text-foreground whitespace-pre-wrap leading-relaxed">{currentQuestion.question}</h3>
 
                   <div className="space-y-3">
                     {currentQuestion.options.map((opt: string, idx: number) => {
@@ -363,7 +363,7 @@ export default function Quiz() {
                           <span className="w-6 h-6 border border-border flex items-center justify-center text-xs text-muted-foreground shrink-0">
                             {String.fromCharCode(65 + idx)}
                           </span>
-                          <span className="line-clamp-2">{opt}</span>
+                          <span className="flex-1 leading-relaxed">{opt}</span>
                           {selectedAnswer !== null && idx === currentQuestion.correctIndex && (
                             <CheckCircle2 className="text-green-500 ml-auto shrink-0" size={18} />
                           )}
