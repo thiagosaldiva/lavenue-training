@@ -33,7 +33,12 @@ async function main() {
   if (allDishes.length > 0) {
     console.log(`Inserting ${allDishes.length} dishes into Turso...`);
     for (const dish of allDishes) {
-       await tursoDb.insert(dishes).values(dish).onConflictDoNothing();
+       await tursoDb.insert(dishes)
+         .values(dish)
+         .onConflictDoUpdate({
+           target: dishes.id,
+           set: dish
+         });
     }
   }
 

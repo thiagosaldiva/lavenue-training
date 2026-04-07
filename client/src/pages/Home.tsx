@@ -170,9 +170,9 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: i * 0.05 }}
                   >
-                    <Link href={`/prato/${dish.id}`}>
-                      <div className="group relative bg-card border border-border hover:border-gold/30 transition-all duration-500 hover:shadow-[0_0_30px_rgba(201,169,110,0.08)] overflow-hidden">
-                        <div className="relative aspect-[4/3] overflow-hidden">
+                    <Link href={`/prato/${dish.id}`} className="block h-full">
+                      <div className="group relative bg-card border border-border hover:border-gold/30 transition-all duration-500 hover:shadow-[0_0_30px_rgba(201,169,110,0.08)] overflow-hidden h-full flex flex-col">
+                        <div className="relative aspect-[4/3] shrink-0 overflow-hidden">
                           {!imageErrors[dish.id] ? (
                             <img
                               src={dish.imageUrl || ""}
@@ -206,7 +206,7 @@ export default function Home() {
                             </span>
                           </div>
                         </div>
-                        <div className="p-5">
+                        <div className="p-5 flex-1 flex flex-col">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <h3 className="font-serif text-lg text-foreground group-hover:text-gold transition-colors duration-300 leading-tight">
                               {dish.name}
@@ -220,7 +220,7 @@ export default function Home() {
                           )}
                           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{dish.description}</p>
                           {allergens.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-1">
+                            <div className="mt-auto pt-4 flex flex-wrap gap-1">
                               {allergens.slice(0, 3).map((a: string, idx: number) => (
                                 <span key={idx} className="text-[10px] px-2 py-0.5 bg-destructive/10 text-destructive border border-destructive/20 tracking-wide">
                                   {a}

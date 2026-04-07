@@ -3,14 +3,14 @@
  * Painel administrativo para edição de pratos, preços e imagens
  * Protegido por autenticação — apenas admins podem editar
  */
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
 import { getCroppedImg } from "@/utils/cropImage";
 import { Link } from "wouter";
 import { useMenu, categoryLabels, type Dish } from "@/contexts/MenuContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getLoginUrl } from "@/const";
@@ -588,7 +588,13 @@ function SortableRow({ dish, updateDish, setEditingDish, setDeleteConfirm, categ
 }
 
 export default function Admin() {
-  const { dishes, removeDish, isLoading, updateDish } = useMenu();
+  const { dishes: serverDishes, removeDish, isLoading, updateDish } = useMenu();
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  
+  useEffect(() => {
+    setDishes(serverDishes);
+  }, [serverDishes]);
+
   const { user } = useAuth();
   const utils = trpc.useUtils();
   const reorderMutation = trpc.dishes.reorder.useMutation({
@@ -598,7 +604,7 @@ export default function Admin() {
     }
   });
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
@@ -689,23 +695,45 @@ export default function Admin() {
     setDeleteConfirm(null);
   };
 
-
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    
+    if (!over) {
+      toast.error("Movimento não registrado: solte o prato exatamente em cima de outro.");
+      return;
+    }
+    if (active.id === over.id) return;
     
     const oldIndex = filtered.findIndex(d => d.id === active.id);
     const newIndex = filtered.findIndex(d => d.id === over.id);
-    if (oldIndex < 0 || newIndex < 0) return;
+    if (oldIndex < 0 || newIndex < 0) {
+      toast.error("Erro ao identificar posição do item.");
+      return;
+    }
     
-    // Sort logic respecting current boundaries
-    const occupiedSorts = filtered.map(d => d.sortOrder).sort((a, b) => a - b);
+    const minSort = Math.min(...filtered.map(d => Number(d.sortOrder) || 0));
+    const safeStart = Number.isFinite(minSort) ? minSort : 0;
     
     const newFiltered = [...filtered];
     const [moved] = newFiltered.splice(oldIndex, 1);
     newFiltered.splice(newIndex, 0, moved);
     
-    const updates = newFiltered.map((d, idx) => ({ id: d.id, sortOrder: occupiedSorts[idx] }));
+    // Calcula valores limpos e sem números repetidos!
+    const updates = newFiltered.map((d, idx) => ({ id: d.id, sortOrder: safeStart + (idx * 10) }));
+    
+    const newDishes = [...dishes];
+    for (const u of updates) {
+      const dbIdx = newDishes.findIndex(d => d.id === u.id);
+      if (dbIdx > -1) newDishes[dbIdx] = { ...newDishes[dbIdx], sortOrder: u.sortOrder };
+    }
+    
+    newDishes.sort((a, b) => {
+      const diff = (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+      return diff !== 0 ? diff : a.id - b.id; // Fallback extremo para estabilidade
+    });
+    
+    setDishes(newDishes);
+
     reorderMutation.mutate(updates);
   };
 
@@ -793,7 +821,7 @@ export default function Admin() {
                     <DndContext 
                       sensors={sensors} 
                       collisionDetection={closestCenter} 
-                      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+                      modifiers={[restrictToVerticalAxis]}
                       onDragEnd={handleDragEnd}
                     >
                       <SortableContext items={filtered.map(d => d.id)} strategy={verticalListSortingStrategy}>
