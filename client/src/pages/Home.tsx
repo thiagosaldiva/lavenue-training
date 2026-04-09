@@ -257,7 +257,7 @@ export default function Home() {
             )}
           </div>
           
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex flex-wrap gap-2 mb-4 pb-2">
             {allergenConfigs.map(filter => {
               const isActive = activeFilters.includes(filter.id);
               return (
