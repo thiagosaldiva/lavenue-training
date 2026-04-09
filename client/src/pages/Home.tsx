@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useMenu, categoryLabels, type Dish } from "@/contexts/MenuContext";
-import { Search, ChefHat, BookOpen, Shield, Sparkles, Tag, LogIn, LogOut, Loader2, Info } from "lucide-react";
+import { Search, ChefHat, BookOpen, Shield, Sparkles, Tag, LogIn, LogOut, Loader2, Info, Ban } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLoginUrl } from "@/const";
 
@@ -257,7 +257,7 @@ export default function Home() {
             )}
           </div>
           
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {allergenConfigs.map(filter => {
               const isActive = activeFilters.includes(filter.id);
               return (
@@ -274,13 +274,14 @@ export default function Home() {
                       : "border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   }`}
                 >
-                  <span className={isActive ? "opacity-100" : "opacity-60"}>🚫</span> {filter.label}
+                  <Ban size={12} className={isActive ? "opacity-100" : "opacity-60"} /> 
+                  {filter.label}
                 </button>
               );
             })}
           </div>
 
-          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-1 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {categories.map(cat => (
               <button
                 key={cat.key}
