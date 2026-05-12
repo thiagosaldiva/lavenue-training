@@ -124,9 +124,9 @@ export default function DishDetail() {
                 {/* Title */}
                 <div className="mb-6">
                   <span className="text-xs text-gold tracking-[0.3em] uppercase">{categoryLabels[dish.category]}</span>
-                  <h1 className="font-serif text-3xl sm:text-4xl text-foreground mt-2 leading-tight">{dish.name}</h1>
-                  {dish.nameFr !== dish.name && (
-                    <p className="font-serif text-lg text-gold/60 italic mt-1">{dish.nameFr}</p>
+                  <h1 className="font-serif text-3xl sm:text-4xl text-foreground mt-2 leading-tight">{dish.nameFr || dish.name}</h1>
+                  {dish.nameFr && dish.nameFr !== dish.name && (
+                    <p className="font-serif text-lg text-gold/60 italic mt-1">{dish.name}</p>
                   )}
                   {dish.price && (
                     <p className="font-serif text-2xl text-gold mt-3">{dish.price}</p>

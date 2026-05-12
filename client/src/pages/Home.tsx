@@ -143,14 +143,14 @@ export default function Home() {
             <div className="p-5 flex-1 flex flex-col">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <h3 className="font-serif text-lg text-foreground group-hover:text-gold transition-colors duration-300 leading-tight">
-                  {dish.name}
+                  {dish.nameFr || dish.name}
                 </h3>
                 {dish.price && (
                   <span className="text-gold font-serif text-lg whitespace-nowrap">{dish.price}</span>
                 )}
               </div>
-              {dish.nameFr !== dish.name && (
-                <p className="text-[11px] text-gold/60 font-serif italic mb-2">{dish.nameFr}</p>
+              {dish.nameFr && dish.nameFr !== dish.name && (
+                <p className="text-[11px] text-gold/60 font-serif italic mb-2">{dish.name}</p>
               )}
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{dish.description}</p>
               {allergens.length > 0 && (
