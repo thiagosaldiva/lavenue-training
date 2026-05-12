@@ -205,8 +205,8 @@ function DishEditor({ dish, onClose }: { dish: Dish; onClose: () => void }) {
       nameFr: form.nameFr,
       category: form.category,
       description: form.description,
-      ingredients: form.ingredients,
-      allergens: form.allergens,
+      ingredients: form.ingredients.filter(Boolean),
+      allergens: form.allergens.filter(Boolean),
       preparation: form.preparation,
       curiosity: form.curiosity,
       imageUrl: form.imageUrl,
@@ -335,7 +335,7 @@ function DishEditor({ dish, onClose }: { dish: Dish; onClose: () => void }) {
         <label className="text-xs text-muted-foreground mb-1 block">Ingredientes (um por linha)</label>
         <textarea
           value={form.ingredients.join("\n")}
-          onChange={(e) => setForm(f => ({ ...f, ingredients: e.target.value.split("\n").filter(Boolean) }))}
+          onChange={(e) => setForm(f => ({ ...f, ingredients: e.target.value.split("\n") }))}
           rows={4}
           className="w-full bg-secondary/50 border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-gold/50 resize-y min-h-[80px]"
         />
@@ -345,7 +345,7 @@ function DishEditor({ dish, onClose }: { dish: Dish; onClose: () => void }) {
         <label className="text-xs text-muted-foreground mb-1 block">Alergênicos (um por linha)</label>
         <textarea
           value={form.allergens.join("\n")}
-          onChange={(e) => setForm(f => ({ ...f, allergens: e.target.value.split("\n").filter(Boolean) }))}
+          onChange={(e) => setForm(f => ({ ...f, allergens: e.target.value.split("\n") }))}
           rows={2}
           className="w-full bg-secondary/50 border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-gold/50 resize-y min-h-[80px]"
         />
@@ -439,7 +439,11 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
       toast.error("Nome é obrigatório");
       return;
     }
-    addDish(form as any);
+    addDish({
+      ...form,
+      ingredients: form.ingredients.filter(Boolean),
+      allergens: form.allergens.filter(Boolean)
+    } as any);
     toast.success(`"${form.name}" adicionado com sucesso`);
     onClose();
   };
@@ -472,11 +476,11 @@ function NewDishForm({ defaultCategory, onClose }: { defaultCategory: string, on
       </div>
       <div>
         <label className="text-xs text-muted-foreground mb-1 block">Ingredientes (um por linha)</label>
-        <textarea value={form.ingredients.join("\n")} onChange={(e) => setForm(f => ({ ...f, ingredients: e.target.value.split("\n").filter(Boolean) }))} rows={3} className="w-full bg-secondary/50 border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-gold/50 resize-y min-h-[80px]" />
+        <textarea value={form.ingredients.join("\n")} onChange={(e) => setForm(f => ({ ...f, ingredients: e.target.value.split("\n") }))} rows={3} className="w-full bg-secondary/50 border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-gold/50 resize-y min-h-[80px]" />
       </div>
       <div>
         <label className="text-xs text-muted-foreground mb-1 block">Alergênicos (um por linha)</label>
-        <textarea value={form.allergens.join("\n")} onChange={(e) => setForm(f => ({ ...f, allergens: e.target.value.split("\n").filter(Boolean) }))} rows={2} className="w-full bg-secondary/50 border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-gold/50 resize-y min-h-[80px]" />
+        <textarea value={form.allergens.join("\n")} onChange={(e) => setForm(f => ({ ...f, allergens: e.target.value.split("\n") }))} rows={2} className="w-full bg-secondary/50 border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:border-gold/50 resize-y min-h-[80px]" />
       </div>
       <div>
         <label className="text-xs text-muted-foreground mb-1 block">Modo de Finalização</label>
